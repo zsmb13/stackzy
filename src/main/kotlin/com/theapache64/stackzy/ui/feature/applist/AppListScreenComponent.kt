@@ -17,6 +17,7 @@ class AppListScreenComponent(
     appComponent: AppComponent,
     private val apkSource: ApkSource<AndroidDeviceWrapper, Account>,
     val onAppSelected: (ApkSource<AndroidDeviceWrapper, Account>, AndroidAppWrapper) -> Unit,
+    val onLibrary2: (ApkSource<AndroidDeviceWrapper, Account>, List<AndroidAppWrapper>) -> Unit,
     val onBackClicked: () -> Unit
 ) : Component, ComponentContext by componentContext {
 
@@ -44,6 +45,9 @@ class AppListScreenComponent(
             onBackClicked = onBackClicked,
             onAppSelected = { app ->
                 onAppSelected(apkSource, app)
+            },
+            onLibrary2 = { apps ->
+                onLibrary2(apkSource, apps)
             }
         )
     }

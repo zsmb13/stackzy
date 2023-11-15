@@ -6,7 +6,10 @@ import com.theapache64.stackzy.ui.feature.appdetail.AppDetailScreenComponent
 import com.theapache64.stackzy.ui.feature.applist.AppListScreenComponent
 import com.theapache64.stackzy.ui.feature.devicelist.DeviceListScreenComponent
 import com.theapache64.stackzy.ui.feature.libdetail.LibraryDetailScreenComponent
+import com.theapache64.stackzy.ui.feature.declibdetail.DecompiledLibraryDetailScreenComponent
 import com.theapache64.stackzy.ui.feature.liblist.LibraryListScreenComponent
+import com.theapache64.stackzy.ui.feature.decall.DecompileAllScreenComponent
+import com.theapache64.stackzy.ui.feature.decappdetail.DecompiledAppDetailScreenComponent
 import com.theapache64.stackzy.ui.feature.login.LogInScreenComponent
 import com.theapache64.stackzy.ui.feature.pathway.PathwayScreenComponent
 import com.theapache64.stackzy.ui.feature.splash.SplashScreenComponent
@@ -33,7 +36,10 @@ interface AppComponent {
     fun inject(deviceListScreenComponent: DeviceListScreenComponent)
     fun inject(updateScreenComponent: UpdateScreenComponent)
     fun inject(libraryListScreenComponent: LibraryListScreenComponent)
+    fun inject(libraryListScreenComponent: DecompileAllScreenComponent)
     fun inject(libraryDetailScreenComponent: LibraryDetailScreenComponent)
+    fun inject(libraryDetailScreenComponent2: DecompiledLibraryDetailScreenComponent)
+    fun inject(decompiledAppDetailScreenComponent: DecompiledAppDetailScreenComponent)
 
     // bind repo to this component
     fun bind(): AdbRepo

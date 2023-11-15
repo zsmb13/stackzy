@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -31,7 +32,8 @@ import com.theapache64.stackzy.util.R
 fun SelectAppScreen(
     appListViewModel: AppListViewModel,
     onBackClicked: () -> Unit,
-    onAppSelected: (AndroidAppWrapper) -> Unit
+    onAppSelected: (AndroidAppWrapper) -> Unit,
+    onLibrary2: (List<AndroidAppWrapper>) -> Unit,
 ) {
 
     val searchKeyword by appListViewModel.searchKeyword.collectAsState()
@@ -47,27 +49,38 @@ fun SelectAppScreen(
         bottomGradient = hasData, // only for success
         topRightSlot = {
 
-            // SearchBox
-            OutlinedTextField(
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Outlined.Search,
-                        contentDescription = ""
-                    )
-                },
-                singleLine = true,
-                value = searchKeyword,
-                label = {
-                    Text(
-                        text = R.string.select_app_label_search,
-                    )
-                },
-                onValueChange = {
-                    appListViewModel.onSearchKeywordChanged(it)
-                },
-                modifier = Modifier
-                    .width(300.dp)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Button(onClick = {
+                    if (hasData) {
+                        val apps = (appsResponse as Resource.Success<List<AndroidAppWrapper>>).data
+                        onLibrary2(apps)
+                    }
+                }, Modifier.padding(end = 16.dp)) {
+                    Text("Decompile all apps")
+                }
+
+                // SearchBox
+                OutlinedTextField(
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = ""
+                        )
+                    },
+                    singleLine = true,
+                    value = searchKeyword,
+                    label = {
+                        Text(
+                            text = R.string.select_app_label_search,
+                        )
+                    },
+                    onValueChange = {
+                        appListViewModel.onSearchKeywordChanged(it)
+                    },
+                    modifier = Modifier
+                        .width(300.dp)
+                )
+            }
         }
     ) {
 
@@ -103,6 +116,7 @@ fun SelectAppScreen(
                     val message = (appsResponse as Resource.Loading<List<AndroidAppWrapper>>).message ?: ""
                     LoadingAnimation(message, funFacts = null)
                 }
+
                 is Resource.Error -> {
                     Box {
                         ErrorSnackBar(
@@ -110,6 +124,7 @@ fun SelectAppScreen(
                         )
                     }
                 }
+
                 is Resource.Success -> {
                     val apps = (appsResponse as Resource.Success<List<AndroidAppWrapper>>).data
 
@@ -151,6 +166,7 @@ fun SelectAppScreen(
                         )
                     }
                 }
+
                 null -> {
                     LoadingAnimation("Preparing apps...", funFacts = null)
                 }

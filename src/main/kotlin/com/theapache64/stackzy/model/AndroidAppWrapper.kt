@@ -4,7 +4,7 @@ import com.theapache64.stackzy.data.local.AndroidApp
 import com.theapache64.stackzy.data.local.AndroidAppDefinition
 import java.util.*
 
-class AndroidAppWrapper(
+data class AndroidAppWrapper(
     val androidApp: AndroidApp,
     val shouldUseVersionNameAsSubTitle: Boolean = false
 ) : AndroidAppDefinition by androidApp, AlphabetCircle() {

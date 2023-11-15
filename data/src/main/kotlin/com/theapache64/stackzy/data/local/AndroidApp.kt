@@ -12,7 +12,7 @@ interface AndroidAppDefinition {
     val appSize: String?
 }
 
-class AndroidApp(
+data class AndroidApp(
     override val appPackage: Package,
     override val isSystemApp: Boolean,
     override val versionCode: Int? = null,

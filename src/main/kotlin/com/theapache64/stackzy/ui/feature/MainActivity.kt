@@ -45,7 +45,7 @@ class MainActivity : Activity() {
         application {
             setContent(
                 onCloseRequest = ::exitApplication,
-                title = "${App.appArgs.appName} (${App.appArgs.version})",
+                title = "${App.appArgs.appName} (${App.appArgs.version} - hacky decompile all edition)",
                 icon = painterResource(R.drawables.appIcon),
                 state = rememberWindowState(
                     width = 1224.dp,

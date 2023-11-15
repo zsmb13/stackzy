@@ -254,7 +254,7 @@ class AppDetailViewModel @Inject constructor(
     /**
      * Downloads APK from device using and decompile it
      */
-    private suspend fun decompileViaAdb() {
+    suspend fun decompileViaAdb() {
         val androidDeviceWrapper = (apkSource as ApkSource.Adb).value
         _loadingMessage.value = R.string.app_detail_loading_fetching_apk
 

@@ -11,8 +11,10 @@ import com.arkivanov.decompose.router.replaceCurrent
 import com.arkivanov.decompose.router.router
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.github.theapache64.gpa.model.Account
+import com.theapache64.stackzy.data.local.AnalysisReport
 import com.theapache64.stackzy.di.AppComponent
 import com.theapache64.stackzy.di.DaggerAppComponent
+import com.theapache64.stackzy.model.AnalysisReportWrapper
 import com.theapache64.stackzy.model.AndroidAppWrapper
 import com.theapache64.stackzy.model.AndroidDeviceWrapper
 import com.theapache64.stackzy.model.LibraryWrapper
@@ -20,7 +22,10 @@ import com.theapache64.stackzy.ui.feature.appdetail.AppDetailScreenComponent
 import com.theapache64.stackzy.ui.feature.applist.AppListScreenComponent
 import com.theapache64.stackzy.ui.feature.devicelist.DeviceListScreenComponent
 import com.theapache64.stackzy.ui.feature.libdetail.LibraryDetailScreenComponent
+import com.theapache64.stackzy.ui.feature.declibdetail.DecompiledLibraryDetailScreenComponent
 import com.theapache64.stackzy.ui.feature.liblist.LibraryListScreenComponent
+import com.theapache64.stackzy.ui.feature.decall.DecompileAllScreenComponent
+import com.theapache64.stackzy.ui.feature.decappdetail.DecompiledAppDetailScreenComponent
 import com.theapache64.stackzy.ui.feature.login.LogInScreenComponent
 import com.theapache64.stackzy.ui.feature.pathway.PathwayScreenComponent
 import com.theapache64.stackzy.ui.feature.splash.SplashScreenComponent
@@ -54,10 +59,26 @@ class NavHostComponent(
             val androidApp: AndroidAppWrapper
         ) : Config()
 
+        data class AppDetail2(
+            val apkSource: ApkSource<AndroidDeviceWrapper, Account>,
+            val analysisReport: AnalysisReportWrapper?,
+        ) : Config()
+
         object Update : Config()
         object LibraryList : Config()
+        data class LibraryList2(
+            val apkSource: ApkSource<AndroidDeviceWrapper, Account>,
+            val androidAppWrappers: List<AndroidAppWrapper>,
+        ) : Config()
+
         data class LibraryDetail(
             val libraryWrapper: LibraryWrapper
+        ) : Config()
+
+        data class LibraryDetail2(
+            val libraryWrapper: LibraryWrapper,
+            val apkSource: ApkSource<AndroidDeviceWrapper, Account>,
+            val analysisResults: List<Pair<AndroidAppWrapper, AnalysisReportWrapper?>>
         ) : Config()
     }
 
@@ -83,6 +104,7 @@ class NavHostComponent(
                 onSyncFinished = ::onSplashSyncFinished,
                 onUpdateNeeded = ::onUpdateNeeded
             )
+
             is Config.SelectPathway -> PathwayScreenComponent(
                 appComponent = appComponent,
                 componentContext = componentContext,
@@ -91,6 +113,7 @@ class NavHostComponent(
                 onPlayStoreSelected = ::onPathwayPlayStoreSelected,
                 onLibrariesSelected = ::onPathwayLibrariesSelected
             )
+
             is Config.LogIn -> LogInScreenComponent(
                 appComponent = appComponent,
                 componentContext = componentContext,
@@ -105,11 +128,13 @@ class NavHostComponent(
                 onDeviceSelected = ::onDeviceSelected,
                 onBackClicked = ::onBackClicked,
             )
+
             is Config.AppList -> AppListScreenComponent(
                 appComponent = appComponent,
                 componentContext = componentContext,
                 apkSource = config.apkSource,
                 onAppSelected = ::onAppSelected,
+                onLibrary2 = ::onLibrary2,
                 onBackClicked = ::onBackClicked
             )
 
@@ -122,15 +147,35 @@ class NavHostComponent(
                 onBackClicked = ::onBackClicked
             )
 
+            is Config.AppDetail2 -> DecompiledAppDetailScreenComponent(
+                appComponent = appComponent,
+                componentContext = componentContext,
+                analysisReport = config.analysisReport,
+                apkSource = config.apkSource,
+                onLibrarySelected = ::onLibrarySelected,
+                onBackClicked = ::onBackClicked,
+            )
+
             is Config.Update -> UpdateScreenComponent(
                 appComponent = appComponent,
                 componentContext = componentContext
             )
+
             is Config.LibraryList -> LibraryListScreenComponent(
                 appComponent = appComponent,
                 componentContext = componentContext,
                 onLibraryClicked = ::onLibraryClicked,
                 onBackClicked = ::onBackClicked
+            )
+
+            is Config.LibraryList2 -> DecompileAllScreenComponent(
+                componentContext = componentContext,
+                appComponent = appComponent,
+                onLibraryClicked = ::onLibraryClicked2,
+                onAppSelected = ::onAppSelected2,
+                onBackClicked = ::onBackClicked,
+                apkSource = config.apkSource,
+                androidAppWrappers = config.androidAppWrappers,
             )
 
             is Config.LibraryDetail -> LibraryDetailScreenComponent(
@@ -141,6 +186,17 @@ class NavHostComponent(
                 libraryWrapper = config.libraryWrapper,
                 onLogInNeeded = ::onLogInNeeded
             )
+
+            is Config.LibraryDetail2 -> DecompiledLibraryDetailScreenComponent(
+                appComponent = appComponent,
+                componentContext = componentContext,
+                onBackClicked = ::onBackClicked,
+                onAppClicked = ::onAppSelected2,
+                libraryWrapper = config.libraryWrapper,
+                apkSource = config.apkSource,
+                analysisResults = config.analysisResults,
+                onLogInNeeded = ::onLogInNeeded
+            )
         }
     }
 
@@ -149,6 +205,14 @@ class NavHostComponent(
      */
     private fun onLibraryClicked(libraryWrapper: LibraryWrapper) {
         router.push(Config.LibraryDetail(libraryWrapper))
+    }
+
+    private fun onLibraryClicked2(
+        libraryWrapper: LibraryWrapper,
+        apkSource: ApkSource<AndroidDeviceWrapper, Account>,
+        analysisResults: List<Pair<AndroidAppWrapper, AnalysisReportWrapper?>>
+    ) {
+        router.push(Config.LibraryDetail2(libraryWrapper, apkSource, analysisResults))
     }
 
 
@@ -242,6 +306,30 @@ class NavHostComponent(
             Config.AppDetail(
                 apkSource = apkSource,
                 androidApp = androidAppWrapper
+            )
+        )
+    }
+
+    private fun onAppSelected2(
+        apkSource: ApkSource<AndroidDeviceWrapper, Account>,
+        analysisReport: AnalysisReportWrapper?,
+    ) {
+        router.push(
+            Config.AppDetail2(
+                apkSource = apkSource,
+                analysisReport = analysisReport,
+            )
+        )
+    }
+
+    private fun onLibrary2(
+        apkSource: ApkSource<AndroidDeviceWrapper, Account>,
+        androidAppWrappers: List<AndroidAppWrapper>,
+    ) {
+        router.push(
+            Config.LibraryList2(
+                apkSource,
+                androidAppWrappers,
             )
         )
     }
